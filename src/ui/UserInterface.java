@@ -23,13 +23,14 @@ public class UserInterface extends JFrame {
 		setPreferredSize(new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT));	
 		pack();	
 		setLayout(new FlowLayout());
-		JButton btn = new JButton();
+		JButton btn = new JButton("Print training set");
 		btn.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				FeatureVectorExport exp = new FeatureVectorExport("input.csv","target.csv");
 				exp.export(pose);
+				exp.closeStream();
 			}
 		});
 		add(btn);

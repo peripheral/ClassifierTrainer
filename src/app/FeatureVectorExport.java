@@ -7,10 +7,12 @@ import java.io.IOException;
 public class FeatureVectorExport {
 	private FileWriter outI = null;
 	private FileWriter outT = null;
-
+	File in = null;
+	File tar = null;
+	
 	public FeatureVectorExport(String fileName,String target){
-		File in = new File(fileName);
-		File tar = new File(target);
+		tar =  new File(target);
+		in = new File(fileName);
 		if(!in.exists()){
 			try {
 				in.createNewFile();
@@ -111,13 +113,14 @@ public class FeatureVectorExport {
 	 * Closes the output stream
 	 */
 	public void closeStream(){
-		System.out.println(outI);
 		try {
 			outI.close();
 			outT.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Failed to close");
+			return;
 		}
+		System.out.println("Data was successfull outputed to:"+in+","+tar);
 	}
 }
