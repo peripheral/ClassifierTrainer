@@ -2,11 +2,14 @@ package ui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import app.Canvas;
+import app.FeatureVectorExport;
 import app.Pose;
 
 public class UserInterface extends JFrame {
@@ -20,7 +23,16 @@ public class UserInterface extends JFrame {
 		setPreferredSize(new Dimension(DEFAULT_WIDTH,DEFAULT_HEIGHT));	
 		pack();	
 		setLayout(new FlowLayout());
-		add(new JButton("Print training set"));
+		JButton btn = new JButton();
+		btn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				FeatureVectorExport exp = new FeatureVectorExport("input.csv","target.csv");
+				exp.export(pose);
+			}
+		});
+		add(btn);
 		add(canvas);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

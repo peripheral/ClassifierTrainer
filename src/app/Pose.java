@@ -37,8 +37,8 @@ public class Pose {
 	private int foot_left[] = null;
 	private int foot_right[] = null;
 	/* HEad dimensions, HH - head height, HW - head width */
-	public int HH = 297;
-	public int HW = 250;
+	public int HH = 225;
+	public int HW = 200;
 	public static final int DEFAULT_DISTANCE_TO_BODY = 2000;
 	public static int SHOULDER_RATIO = 3;
 	/* tan(35) * 2000 , with field view of 70 degrees at distance of 2000mm */
@@ -48,9 +48,9 @@ public class Pose {
 	public static int KINECT_WIDTH_RESOLUTION= 640;
 	public static int KINECT_HEIGHT_RESOLUTION= 480;
 	/* Pixel to length to mm ratio in x dim */
-	public static int PIXEL_TO_MM_RATIO_X= 19000/640;
+	public static double PIXEL_TO_MM_RATIO_X=640/19000;
 	/* Pixel to length to mm ratio in x dim */
-	public static int PIXEL_TO_MM_RATIO_Y= 2000/480;
+	public static double PIXEL_TO_MM_RATIO_Y= 480/2000;
 	public int X_OFFSET = 0;
 	public int Y_OFFSET = 0;
 	public int Z_OFFSET = 0;
@@ -61,6 +61,7 @@ public class Pose {
 	public int SQUARE_HEIGHT = 10;
 	/* square radius */
 	public int SQUARE_RADIUS = 5;
+	private int[] targetArray = {0,0,0};
 
 	public Pose(){
 		/* Total height is 9 heads, position of the head
@@ -283,8 +284,8 @@ public class Pose {
 	 * @param coords
 	 * @return converted coords
 	 */
-	private int[] convertToKinectCoordinates(int[] coords){
-		int[] temp = {coords[0]*PIXEL_TO_MM_RATIO_X,coords[1]*PIXEL_TO_MM_RATIO_Y,coords[2]};
+	public int[] convertToKinectCoordinates(int[] coords){
+		int[] temp = {(int)(coords[0]*PIXEL_TO_MM_RATIO_X),(int)(coords[1]*PIXEL_TO_MM_RATIO_Y),coords[2]};
 		return temp;
 	}
 
@@ -446,5 +447,9 @@ public class Pose {
 
 	public void setFoot_right(int[] foot_right) {
 		this.foot_right = foot_right;
+	}
+
+	public int[] getTargetArray() {		
+		return targetArray;
 	}
 }
