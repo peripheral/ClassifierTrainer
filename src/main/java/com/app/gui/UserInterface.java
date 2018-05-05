@@ -1,17 +1,18 @@
 package com.app.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeMap;
-
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,9 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-import javax.media.opengl.awt.GLCanvas;
-
 import com.app.classifiers.wrappers.AnnClassifierWrapper;
 import com.app.classifiers.wrappers.IClassifierWrapper;
 import com.app.classifiers.wrappers.KnnClassifierWrapper;
@@ -31,8 +29,6 @@ import com.app.classifiers.wrappers.RandomTreesClassifierWrapper;
 import com.app.data.visualisation.DataStatsPane;
 import com.app.generator.SetGenerator;
 import com.app.generator.SetGenerator.TAG;
-import com.app.graphics.PoseRenderer;
-import com.app.utility.io.PostureReader;
 
 public class UserInterface extends JFrame  {
 	/**
@@ -42,9 +38,18 @@ public class UserInterface extends JFrame  {
 	public final static int DEFAULT_WIDTH = 400;
 	public final static int DEFAULT_HEIGHT = 700;
 	private static final Dimension PREFFERED_FRAME_SIZE = new Dimension(400,800);
-	//private PoseCanvas canvas = new PoseCanvas();
+	/**
+	 * Not implemented
+	 */
 	private JTextField radialDistance;
+	
+	/**
+	 * Amount of rows to produce
+	 */
 	private JTextField size;
+	/**
+	 * Input destination
+	 */
 	private JTextField inputDestinationPercentages;
 	private JTextField inputDevDestination;
 	private JTextField inputAngleDestination;
@@ -61,6 +66,7 @@ public class UserInterface extends JFrame  {
 	private DataStatsPane stats = new DataStatsPane();
 	private JPanel trainingProgressBar;
 	private JLabel trainingInformation;
+	private JPanel inputFields;
 
 	public UserInterface(){
 		super("Window");
@@ -146,8 +152,9 @@ public class UserInterface extends JFrame  {
 		JPanel bottomContainer = new JPanel();
 		bottomContainer.setLayout(new BoxLayout(bottomContainer, BoxLayout.PAGE_AXIS));
 		JProgressBar progressbar = new JProgressBar();
+		progressbar.setAlignmentX(CENTER_ALIGNMENT);
 		JButton btnPrintSet = new JButton("Print training set");
-		JButton btnStopPrinting = new JButton("Stop Printing");
+		//JButton btnStopPrinting = new JButton("Stop Printing");
 		JButton btnRunStatistics = new JButton("Graph statistics");
 		JFrame parent = this;
 		btnRunStatistics.addActionListener(new ActionListener() {
@@ -196,7 +203,7 @@ public class UserInterface extends JFrame  {
 			}
 		});
 
-		bottomContainer.add(progressbar);
+	//	bottomContainer.add(progressbar);
 		
 		trainingProgressBar = new JPanel();
 		trainingInformation = new JLabel("Currently Training");
@@ -205,12 +212,39 @@ public class UserInterface extends JFrame  {
 		ImageIcon waitingIncon = new ImageIcon("images/ajax-loader.gif");
 		trainingProgressBar.add(new JLabel(waitingIncon),BorderLayout.EAST);
 		trainingProgressBar.setVisible(false);
-		JPanel lowerBtnPanel = new JPanel();
-		lowerBtnPanel.setLayout(new BoxLayout(lowerBtnPanel, BoxLayout.LINE_AXIS));
-		lowerBtnPanel.add(btnPrintSet);
-		lowerBtnPanel.add(btnRunStatistics);
-		bottomContainer.add(lowerBtnPanel);
+		trainingProgressBar.setAlignmentX(CENTER_ALIGNMENT);
+		JPanel executionControlBtnGroup = new JPanel();
+		executionControlBtnGroup.setLayout(new BoxLayout(executionControlBtnGroup, BoxLayout.LINE_AXIS));
+		executionControlBtnGroup.add(btnPrintSet);
+		executionControlBtnGroup.add(btnRunStatistics);
+		executionControlBtnGroup.setAlignmentX(CENTER_ALIGNMENT);
+
+		bottomContainer.add(executionControlBtnGroup);
 		bottomContainer.add(trainingProgressBar);
+		JButton showMoreInputs = new JButton("Show more");
+		inputFields = new JPanel();
+		inputFields.setLayout(new BoxLayout(inputFields, BoxLayout.PAGE_AXIS));
+		inputFields.setSize(new Dimension(getWidth(), 200));
+		inputFields.setVisible(false);
+		showMoreInputs.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(inputFields.isVisible()) {
+					inputFields.setVisible(false);	
+					showMoreInputs.setText("Show more");
+				}else {
+					inputFields.setVisible(true);
+					showMoreInputs.setText("Hide");
+				}
+			}
+		});
+		showMoreInputs.setAlignmentX(CENTER_ALIGNMENT);
+		showMoreInputs.setMaximumSize(new Dimension(Integer.MAX_VALUE, 26));
+		inputFields.setAlignmentX(CENTER_ALIGNMENT);
+		addExtraInputfields(inputFields);
+		bottomContainer.add(showMoreInputs);
+		bottomContainer.add(inputFields);
 		JButton trainBtn = new JButton("Train");
 		trainBtn.addActionListener(new ActionListener() {
 
@@ -224,13 +258,24 @@ public class UserInterface extends JFrame  {
 
 			}
 		});
-		lowerBtnPanel.add(trainBtn);
+		executionControlBtnGroup.add(trainBtn);
 		btnPrintSet.setAlignmentX(CENTER_ALIGNMENT);
 		add(bottomContainer, BorderLayout.SOUTH);
 		add(stats,BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		setVisible(true);
+	}
+	private void addExtraInputfields(JPanel inputFields) {
+		String[] names = {"annImageOutDestAngles","annImageOutDestDevs","annImageOutDestPercents",
+				"knnImageOutDestAngles","knnImageOutDestDevs","knnImageOutDestPercents",
+				"RTreesImageOutDestAngles","RTreesImageOutDestDevs","RTreesImageOutDestPercents"};
+		JTextField tField;
+		for(String name:names) {
+			tField = new JTextField(name+(Calendar.getInstance().get(Calendar.MONTH)+1)+"."+Calendar.getInstance().get(Calendar.DATE)+".ml");
+			tField.setName(name);
+			inputFields.add(tField);
+		}
 	}
 	private String annImageOutDest1 = "annTrained1.ml";
 	private String knnImageOutDest1 = "knnTrained1.ml";
@@ -242,6 +287,7 @@ public class UserInterface extends JFrame  {
 	private String knnImageOutDest3 = "knnTrained3.ml";
 	private String rTreesImageOutDest3 = "rTreesTrained3.ml";
 	private void trainClassifiers() {
+		getImageDestinations(inputFields);
 		trainingInformation.setText("Currently training:Ann, Angles,38 features");
 		trainingProgressBar.setVisible(true);
 		traineClassifier(annWrapper,inputAngleDestination.getText(),tarDestANN.getText(),
@@ -276,6 +322,50 @@ public class UserInterface extends JFrame  {
 		revalidate();
 	}
 
+	private void getImageDestinations(JPanel inputFields) {
+		String[] names = {"annImageOutDestAngles","annImageOutDestDevs","annImageOutDestPercents",
+				"knnImageOutDestAngles","knnImageOutDestDevs","knnImageOutDestPercents",
+				"RTreesImageOutDestAngles","RTreesImageOutDestDevs","RTreesImageOutDestPercents"};
+		Component[] components = inputFields.getComponents();
+		Map<String,Component> map = new HashMap<>();
+		for(Component comp:components) {
+			map.put(comp.getName(),comp);
+		}
+		for(String name:names) {
+			setValue(name,((JTextField)map.get(name)).getText());
+		}
+	}
+	
+	private void setValue(String name, String text) {
+		if(name.equalsIgnoreCase("annImageOutDestAngles")) {
+			annImageOutDest1 = text;
+		}
+		if(name.equalsIgnoreCase("annImageOutDestDevs")) {
+			annImageOutDest2 = text;
+		}
+		if(name.equalsIgnoreCase("annImageOutDestPercents")){
+			annImageOutDest3 = text;
+		}
+		if(name.equalsIgnoreCase("knnImageOutDestAngles")) {
+			knnImageOutDest1 = text;
+		}
+		if(name.equalsIgnoreCase("knnImageOutDestDevs")) {
+			knnImageOutDest2 = text;
+		}
+		if(name.equalsIgnoreCase("knnImageOutDestPercents")) {
+			knnImageOutDest3 = text;
+		}
+		if(name.equalsIgnoreCase("RTreesImageOutDestAngles")) {
+			rTreesImageOutDest1 = text;
+		}
+		if(name.equalsIgnoreCase("RTreesImageOutDestDevs")) {
+			rTreesImageOutDest2 = text;
+		}
+		if(name.equalsIgnoreCase("RTreesImageOutDestPercents")) {
+			rTreesImageOutDest3 = text;
+		}		
+	}
+	
 	private void traineClassifier(IClassifierWrapper wrapper, String inputData, String targetData,
 			String imgOutputDest,int inSize) {
 		wrapper.setInputVectorLength(inSize);

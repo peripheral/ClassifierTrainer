@@ -66,7 +66,7 @@ public class SetGenerator {
 	public enum TAG{SPARCITY, ROWS};
 
 	/**
-	 * Constructor initiates setgenerator to create input and target vector for ANN. 
+	 * Constructor initiates set generator to create input and target vector for ANN. 
 	 * Where input vector is consisting of angles and target vectors consists of
 	 *  zeros and once.
 	 * @param inAngleFileName - 
